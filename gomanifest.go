@@ -211,20 +211,23 @@ func getTransitiveDetails(modPath string, importPath string) []Transitive {
 }
 
 func buildTransitiveDeps() {
+	var totalTransitives = 0
 	for k, ddeps := range directDependencies {
 		var dm = directDependencies[k]
 		if ddeps.Included {
 			dm.Transitives = getTransitiveDetails(ddeps.Name, ddeps.Name)
+			totalTransitives = totalTransitives + len(dm.Transitives)
 		}
 		dm.Packages = make([]DirectPackage, 0)
 
 		for _, pckg := range ddeps.Packages {
 			pckg.Transitives = getTransitiveDetails(ddeps.Name, pckg.Name)
+			totalTransitives = totalTransitives + len(pckg.Transitives)
 			dm.Packages = append(dm.Packages, pckg)
 		}
 		directDependencies[k] = dm
 	}
-	fmt.Println("Added transitive dependencies")
+	fmt.Println("Added transitive dependencies ::", totalTransitives)
 }
 
 func buildManifest() {
@@ -317,9 +320,9 @@ func buildManifest2() {
 func main() {
 	if (len(os.Args) != 3) {
 		fmt.Println("Error :: Invalid arguments for the command.")
-		fmt.Println("Usage :: gomanifest <Absolute source root folder path containing go.mod> <Output file path>.json")
+		fmt.Println("Usage :: go run github.com/dgpatelgit/gobuildmanifest <Absolute source root folder path containing go.mod> <Output file path>.json")
 		fmt.Println("")
-		fmt.Println("Example :: gomanifest /home/user/goproject/root/folder /home/user/gomanifest.json")
+		fmt.Println("Example :: go run github.com/dgpatelgit/gobuildmanifest /home/user/goproject/root/folder /home/user/gomanifest.json")
 	} else {
 		_, err := os.Stat(os.Args[1])
 		if (err != nil) {
