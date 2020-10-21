@@ -1,3 +1,3 @@
-module github.com/dgpatelgit/fabric8-analytics-vscode-extension/tree/APPAI-1575/golang/build-manifest
+module github.com/dgpatelgit/gobuildmanifest
 
 go 1.15
