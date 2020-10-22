@@ -74,6 +74,11 @@ var goPackages GoPackages
 
 var mainModule string = ""
 var directDependencies = make(map[string]DirectDependency)
+var totalDirectModuleDependencies = 0
+var totalDependencyPackages = 0
+var totalImports = 0
+var totalDirectDependencies = 0
+var totalTransitivesDependencies = 0
 
 func contains(s []string, searchterm string) bool {
 	sort.Strings(s)
@@ -103,10 +108,11 @@ func processGraphData() int {
 					mainModule = pc[0]
 					mv := strings.Split(pc[1], "@")
 					directDependencies[mv[0]] = DirectDependency{mv[0], mv[1], false, make([]DirectPackage, 0), make([]Transitive, 0)}
+					totalDirectModuleDependencies++
 				}
 			}
 		}
-		fmt.Println("Direct dependencies: ", len(directDependencies))
+		fmt.Println("Direct module dependencies:", totalDirectModuleDependencies)
 	}
 
 	return 0
@@ -124,7 +130,8 @@ func processDepsData() int {
 		goListDepsData = "{\"Packages\": [" + strings.ReplaceAll(goListDepsData, "}\n{", "},\n{") + "]}"
 
 		json.Unmarshal([]byte(goListDepsData), &goPackages)
-		fmt.Println("Total packages in deps: ", len(goPackages.Packages))
+		totalDependencyPackages = len(goPackages.Packages)
+		fmt.Println("Packages in deps:", totalDependencyPackages)
 	}
 	return 0
 }
@@ -142,9 +149,9 @@ func buildDirectDependencies() {
 			}
 		}
 	}
-	fmt.Println("Total imports: ", len(sourceImports))
+	totalImports = len(sourceImports)
+	fmt.Println("Source code imports:", totalImports)
 
-	var importsAdded = 0
 	for mk, mod := range directDependencies {
 		for _, imp := range sourceImports {
 			if imp == mod.Name || strings.HasPrefix(imp, mod.Name+"/") {
@@ -155,11 +162,11 @@ func buildDirectDependencies() {
 					om.Packages = append(directDependencies[mk].Packages, DirectPackage{imp, make([]Transitive, 0)})
 				}
 				directDependencies[mk] = om
-				importsAdded++
+				totalDirectDependencies++
 			}
 		}
 	}
-	fmt.Println("Total imports as direct dependencies: ", importsAdded)
+	fmt.Println("Direct dependencies from imports:", totalDirectDependencies)
 }
 
 func findAndAddTransitive(importPath string, transitivies []Transitive) []Transitive {
@@ -174,6 +181,7 @@ func findAndAddTransitive(importPath string, transitivies []Transitive) []Transi
 						transitivies[t].Packages = append(transitivies[t].Packages, importPath)
 					}
 					foundModule = true
+					totalTransitivesDependencies++
 				}
 			}
 
@@ -187,6 +195,7 @@ func findAndAddTransitive(importPath string, transitivies []Transitive) []Transi
 					newTrans.Packages = append(newTrans.Packages, importPath)
 				}
 				transitivies = append(transitivies, newTrans)
+				totalTransitivesDependencies++
 			}
 		}
 	}
@@ -211,23 +220,20 @@ func getTransitiveDetails(modPath string, importPath string) []Transitive {
 }
 
 func buildTransitiveDeps() {
-	var totalTransitives = 0
 	for k, ddeps := range directDependencies {
 		var dm = directDependencies[k]
 		if ddeps.Included {
 			dm.Transitives = getTransitiveDetails(ddeps.Name, ddeps.Name)
-			totalTransitives = totalTransitives + len(dm.Transitives)
 		}
 		dm.Packages = make([]DirectPackage, 0)
 
 		for _, pckg := range ddeps.Packages {
 			pckg.Transitives = getTransitiveDetails(ddeps.Name, pckg.Name)
-			totalTransitives = totalTransitives + len(pckg.Transitives)
 			dm.Packages = append(dm.Packages, pckg)
 		}
 		directDependencies[k] = dm
 	}
-	fmt.Println("Added transitive dependencies ::", totalTransitives)
+	fmt.Println("Total transitive dependencies:", totalTransitivesDependencies)
 }
 
 func buildManifest() {
