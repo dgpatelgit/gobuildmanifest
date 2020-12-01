@@ -16,8 +16,8 @@ func main() {
 	// Validate required number of parameters.
 	if len(os.Args) != 3 {
 		log.Error().Msg("invalid arguments for the command")
-		log.Info().Msgf("Usage :: %s <Path to source folder> <Output file path>/golist.json", os.Args[0])
-		log.Info().Msgf("Example :: %s /home/user/goproject/root/folder /home/user/gomanifest.json", os.Args[0])
+		log.Info().Msgf("Usage :: go run github.com/fabric8-analytics/cli-tools/gomanifest <Path to source folder> <Output file path>/golist.json")
+		log.Info().Msgf("Example :: go run github.com/fabric8-analytics/cli-tools/gomanifest /home/user/goproject/root/folder /home/user/golist.json")
 		os.Exit(1)
 	}
 
