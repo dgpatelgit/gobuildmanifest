@@ -32,7 +32,7 @@ func GetGoExecutable() (*GoListCmd, error) {
 func RunGoList(cwd string) (*GoListCmd, error) {
 	cmd, err := GetGoExecutable()
 	if err != nil {
-		log.Error().Err(err).Msg("`go list` failed")
+		log.Error().Err(err).Msg("`which go` failed")
 		return nil, err
 	}
 
