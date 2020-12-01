@@ -29,7 +29,7 @@ func GetGoExecutable() (*GoListCmd, error) {
 }
 
 // RunGoList ... Actual function that executes go list command and returns output as string.
-func RunGoList(cwd string) (*GoListCmd, error) {
+func RunGoList(cwd string, goExe string) (*GoListCmd, error) {
 	cmd, err := GetGoExecutable()
 	if err != nil {
 		log.Error().Err(err).Msg("`which go` failed")
@@ -40,14 +40,15 @@ func RunGoList(cwd string) (*GoListCmd, error) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(cmd.ReadCloser())
 	s := strings.TrimSpace(buf.String())
-	log.Info().Msg("Go executable " + s)
+	log.Info().Msg("Found go executable " + s)
 
 	// Wait for the `go list` command to complete.
 	if err := cmd.Wait(); err != nil {
 		return nil, fmt.Errorf("%v: `go list` failed, use `go mod tidy` to known more", err)
 	}
 
-	goList := exec.Command(s, "list", "-json", "-deps", "-mod=readonly", "./...")
+	log.Info().Msg("Passed go executable " + goExe)
+	goList := exec.Command(goExe, "list", "-json", "-deps", "-mod=readonly", "./...")
 	goList.Dir = cwd
 	output, err := goList.StdoutPipe()
 	if err != nil {

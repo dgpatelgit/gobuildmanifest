@@ -14,7 +14,7 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	// Validate required number of parameters.
-	if len(os.Args) != 3 {
+	if len(os.Args) != 4 {
 		log.Error().Msg("invalid arguments for the command")
 		log.Info().Msgf("Usage :: go run github.com/fabric8-analytics/cli-tools/gomanifest <Path to source folder> <Output file path>/golist.json")
 		log.Info().Msgf("Example :: go run github.com/fabric8-analytics/cli-tools/gomanifest /home/user/goproject/root/folder /home/user/golist.json")
@@ -30,7 +30,7 @@ func main() {
 
 	// Start generating manifest data.
 	log.Info().Msgf("Started analysing go project at %s", os.Args[1])
-	cmd, err := internal.RunGoList(os.Args[1])
+	cmd, err := internal.RunGoList(os.Args[1], os.Args[3])
 	if err != nil {
 		log.Error().Err(err).Msg("`go list` failed")
 		os.Exit(3)
