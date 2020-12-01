@@ -2,7 +2,6 @@ package internal
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os/exec"
 	"strings"
@@ -43,9 +42,9 @@ func RunGoList(cwd string, goExe string) (*GoListCmd, error) {
 	log.Info().Msg("Found go executable " + s)
 
 	// Wait for the `go list` command to complete.
-	if err := cmd.Wait(); err != nil {
-		return nil, fmt.Errorf("%v: `go list` failed, use `go mod tidy` to known more", err)
-	}
+	//if err := cmd.Wait(); err != nil {
+	//	return nil, fmt.Errorf("%v: `go list` failed, use `go mod tidy` to known more", err)
+	//}
 
 	log.Info().Msg("Passed go executable " + goExe)
 	goList := exec.Command(goExe, "list", "-json", "-deps", "-mod=readonly", "./...")
