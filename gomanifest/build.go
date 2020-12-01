@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/fabric8-analytics/cli-tools/gomanifest/internal"
+	"github.com/dgpatelgit/gobuildmanifest/gomanifest/internal"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

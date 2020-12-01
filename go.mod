@@ -1,4 +1,4 @@
-module github.com/fabric8-analytics/cli-tools
+module github.com/dgpatelgit/gobuildmanifest
 
 go 1.15
 
